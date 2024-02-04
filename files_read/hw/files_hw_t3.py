@@ -30,19 +30,19 @@ class NewText:
         text_list.sort(key=lambda x: x[1])
         for text in text_list:
             self.new_text += '\n'.join(text)
+        return self.new_text
 
     def save_to_file(self):
-        print(self.new_file)
         path_to_dir = os.path.join(os.getcwd(), os.sep.join(self.new_file.split('/')[1:-1]))
         print(path_to_dir)
         if os.path.exists(path_to_dir):
             with open(self.new_file, 'w', encoding='utf8') as f:
-                f.write(self.new_text)
+                f.write(self.get_new_text())
                 print(f'Текст сохранен в файле: {os.path.join(os.getcwd(), os.sep.join(self.new_file.split('/')[1:]))}')
         else:
             os.makedirs(path_to_dir)
             with open(self.new_file, 'w', encoding='utf8') as f:
-                f.write(self.new_text)
+                f.write(self.get_new_text())
                 print(f'Текст сохранен в файле: {os.path.join(os.getcwd(), os.sep.join(self.new_file.split('/')[1:]))}')
 
 
