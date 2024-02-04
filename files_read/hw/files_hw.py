@@ -26,9 +26,6 @@ def add_cook_book(list_recipe):
     return recipes
 
 
-print(get_list_recipes('recipes.txt'))
-
-
 def get_shop_list_by_dishes(dishes, person_count=1):
     cook_book = add_cook_book(get_list_recipes('recipes.txt'))
     shop_list = {}
@@ -45,4 +42,5 @@ def get_shop_list_by_dishes(dishes, person_count=1):
     return dict(sorted(shop_list.items()))
 
 
+print(add_cook_book(get_list_recipes('recipes.txt')))
 print(get_shop_list_by_dishes(['Запеченный картофель', 'Омлет'], 2))
