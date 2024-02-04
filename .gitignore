@@ -160,3 +160,4 @@ cython_debug/
 .idea
 
 OOP/hw/for_test.py
+files_read/hw/export
