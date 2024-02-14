@@ -11,7 +11,7 @@ class VKAPIClient:
     """" VK API client """
     API_BASE_URL = 'https://api.vk.com/method'
 
-    def __init__(self, token, user_id):
+    def __init__(self, user_id, token=VK_TOKEN):
         self.token = token
         self.user_id = user_id
 
@@ -42,7 +42,7 @@ class VKAPIClient:
         """Get integer user id from VK API by user_id"""
         return self.get_user_info()['response'][0]['id']
 
-    def get_photos_info(self, album_id):
+    def get_photos_info(self, album_id='profile'):
         """Get photo from VK"""
         params = self.get_common_params()
         params.update({
@@ -53,7 +53,7 @@ class VKAPIClient:
         response = requests.get(self._build_url('photos.get'), params=params)
         return response.json()['response']['items']
 
-    def get_large_photos(self, album_id):
+    def get_large_photos(self, album_id='profile', count=5):
         large_photo_urls = []
         for photos in self.get_photos_info(album_id):
             large_photo_urls.append({
@@ -62,10 +62,20 @@ class VKAPIClient:
                 'url': photos['sizes'][-1]['url'],
                 'size': photos['sizes'][-1]['type']
             })
-        return large_photo_urls
+        return large_photo_urls[-count:]
+
+
+class LargePhoto:
+    def __init__(self, user_id, count_for_save=5):
+        self.user_id = user_id
+        self.photos = VKAPIClient(user_id).get_large_photos(count=count_for_save)
+
+    def download(self):
+        for photo in self.photos:
+            print(photo)
 
 
 if __name__ == '__main__':
-    vk_client = VKAPIClient(VK_TOKEN, 'arbuzov.producer')
-    print(vk_client.get_user_info())
-    pprint(vk_client.get_large_photos('profile'))
+    # vk_client = VKAPIClient('arbuzov.producer')
+    # print(vk_client.get_user_info())
+    pprint(LargePhoto('arbuzov.producer').photos)
