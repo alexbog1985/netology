@@ -1,6 +1,8 @@
 import secret
 import requests
 import datetime
+import time
+from tqdm import tqdm
 from pprint import pprint
 
 VK_TOKEN = secret.VK_TOKEN
@@ -40,7 +42,10 @@ class VKAPIClient:
 
     def get_int_user_id(self, user_id):
         """Get integer user id from VK API by user_id"""
-        return self.get_user_info()['response'][0]['id']
+        if self.get_user_info().get('response'):
+            return self.get_user_info()['response'][0]['id']
+        else:
+            print(self.get_user_info())
 
     def get_photos_info(self, album_id='profile'):
         """Get photo from VK"""
@@ -71,11 +76,31 @@ class LargePhoto:
         self.photos = VKAPIClient(user_id).get_large_photos(count=count_for_save)
 
     def download(self):
-        for photo in self.photos:
-            print(photo)
+        for photo in tqdm(self.photos, ncols=80, desc='Downloading...'):
+            response = requests.get(photo['url'])
+            with open(
+                    f"{photo['likes']}.jpg",
+                    'wb'
+                 ) as file:
+                file.write(response.content)
+
+            #
+            #
+            # url_for_upload = f'{url_base}/v1/disk/resources/upload'
+            # params = {
+            #     'path': f'98/{image_name}'
+            # }
+            # response = requests.get(url_for_upload,
+            #                         params=params,
+            #                         headers=headers)
+            # current_url_upload = response.json().get('href')
+            # with open(image_name, 'rb') as file:
+            #     response = requests.put(current_url_upload, files={"file": file})
+            #     print(response.status_code)
 
 
 if __name__ == '__main__':
     # vk_client = VKAPIClient('arbuzov.producer')
     # print(vk_client.get_user_info())
-    pprint(LargePhoto('arbuzov.producer').photos)
+    user_ph = LargePhoto('id60453017')
+    user_ph.download()
