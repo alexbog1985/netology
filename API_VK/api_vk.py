@@ -1,7 +1,7 @@
 import secret
 import requests
 import datetime
-import time
+import os
 from tqdm import tqdm
 from pprint import pprint
 
@@ -75,14 +75,27 @@ class LargePhoto:
         self.user_id = user_id
         self.photos = VKAPIClient(user_id).get_large_photos(count=count_for_save)
 
-    def download(self):
+    def _download(self, path_to_dir):
+        print(f'Началась загрузка файлов')
         for photo in tqdm(self.photos, ncols=80, desc='Downloading...'):
+            file_name = f"{photo['likes']}"
+            if os.path.isfile(path_to_dir + os.sep + file_name + '.jpg'):
+                file_name += f"-{photo['create_date']}"
             response = requests.get(photo['url'])
             with open(
-                    f"{photo['likes']}.jpg",
+                    f"{path_to_dir}{os.sep}{file_name}.jpg",
                     'wb'
-                 ) as file:
+            ) as file:
                 file.write(response.content)
+
+    def save_to_dir(self):
+        path_to_dir = os.path.join(f"{os.getcwd()}{os.sep}files")
+        if os.path.exists(path_to_dir):
+            self._download(path_to_dir)
+        else:
+            os.makedirs(path_to_dir)
+            self._download(path_to_dir)
+
 
             #
             #
@@ -103,4 +116,4 @@ if __name__ == '__main__':
     # vk_client = VKAPIClient('arbuzov.producer')
     # print(vk_client.get_user_info())
     user_ph = LargePhoto('id60453017')
-    user_ph.download()
+    user_ph.save_to_dir()
